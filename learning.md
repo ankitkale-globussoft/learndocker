@@ -204,3 +204,76 @@ Jenkins can be used to automate the conversion of the application into a Docker 
 After creating the `Dockerfile`, build the image with:
 
 20. `docker build -t APP_NAME:VERSION .`
+
+```markdown
+## Publishing a Docker Image to Docker Hub
+
+1. Log in to Docker Hub and create a new public (or private) repository. Note the repository name (e.g., `username/my-app`).
+2. Log in from the terminal:
+   ```bash
+   docker login
+   ```
+3. Build the image using the exact repository name and a tag:
+   ```bash
+   docker build -t username/my-app:latest .
+   ```
+4. Push the image to Docker Hub:
+   ```bash
+   docker push username/my-app:latest
+   ```
+
+## Volumes in Docker
+
+Volumes provide persistent data storage for containers. Data stored in a volume exists outside the container lifecycle and can be shared among multiple containers.
+
+### Volume Types & Usage
+
+| Type              | Syntax Example                                    | Description                                                                 |
+|-------------------|---------------------------------------------------|-----------------------------------------------------------------------------|
+| **Named Volume** (recommended) | `docker run -v VOL_NAME:/cont_dir IMAGE`         | Docker-managed volume with a custom name. Most commonly used.               |
+| **Anonymous Volume**           | `docker run -v /cont_dir IMAGE`                  | Docker creates a temporary unnamed volume.                                  |
+| **Bind Mount**                 | `docker run -v /host/path:/cont_dir IMAGE`       | Host filesystem directory is directly mounted; managed by the host, not Docker. |
+
+### Volume Management Commands
+
+```bash
+docker volume ls          # List all volumes
+docker volume create VOL_NAME   # Create a named volume
+docker volume rm VOL_NAME       # Remove a specific volume
+docker volume prune             # Remove all unused volumes
+```
+
+### Defining Volumes in Docker Compose (`docker-compose.yml`)
+
+```yaml
+services:
+  my-service:
+    image: my-image
+    volumes:
+      - my-data:/app/data          # Named volume
+      - ./host-folder:/app/host    # Bind mount
+
+volumes:
+  my-data:                       # Declares the named volume
+```
+
+## Docker Networks (Detailed)
+
+Docker networks control how containers communicate with each other and with the outside world.
+
+| Network Type | Driver   | Key Characteristics                                                                 | Common Use Case                                      |
+|--------------|----------|-------------------------------------------------------------------------------------|------------------------------------------------------|
+| **Bridge**   | bridge   | Default network. Containers on the same bridge network can communicate via container names/IPs. Isolated from host network. | Multiple containers interacting on the same host (most common). |
+| **Host**     | host     | Container uses the host’s network stack directly. No port mapping needed; container has no separate IP. | Performance-critical apps needing direct host network access. |
+| **None**     | none     | Container has no network interface except loopback. Completely isolated.           | Tasks requiring full network isolation (e.g., security-sensitive processes). |
+
+### Network Commands Recap
+
+```bash
+docker network ls                  # List networks
+docker network create my-network   # Create a custom bridge network
+docker run --network my-network ...   # Run container on specific network
+```
+
+**End of Docker Notes**
+```
